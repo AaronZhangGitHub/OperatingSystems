@@ -12,7 +12,7 @@
 //Need to add a check if, the last character is an *, see if the next char is an *
 
 int main(){
-    int outputLength = 5;
+    int outputLength = 4;
     char c;
     char input[outputLength];
     int i =0;
@@ -45,6 +45,7 @@ int main(){
                 printf("%c",input[i]);//followed by a newline
             }
             //reset value of i to 0, will only trigger if output length characters written again
+            printf("\n");//newline
             i = 0;
         }
     }
