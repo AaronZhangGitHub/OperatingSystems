@@ -20,7 +20,7 @@ int main(){
     while ((c = getchar()) != EOF){
         if(c=='\n'){
             //replace with a space
-            c = '.';
+            c = ' ';
         }else if(c=='*' && i>0){
             //check if previous is also an ast, need handle if it is the first char as well
             if(input[i-1]=='*'){
