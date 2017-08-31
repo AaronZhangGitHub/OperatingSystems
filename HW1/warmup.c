@@ -24,7 +24,7 @@ int main(){
             c = ' ';
         }else if(c=='*'){
             //check if next input is a *, if so replace
-            char temp = getchar();
+            char temp = getchar(); //next char in the buffer
             if(temp=='*'){
                 c = '^';
             }else{
@@ -37,10 +37,10 @@ int main(){
         if(i==outputLength){
             //print results
             for (int i =0; i<sizeof(input)/sizeof(char);i++){
-                printf("%c",input[i]);//followed by a newline
+                printf("%c",input[i]);
             }
             //reset value of i to 0, will only trigger if output length characters written again
-            printf("\n");//newline
+            printf("\n");//newline added to end of each {outputLength} length char output
             i = 0;
         }
     }
