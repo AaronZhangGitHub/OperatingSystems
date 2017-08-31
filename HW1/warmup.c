@@ -3,7 +3,8 @@
 //  
 //
 //  Created by Aaron Zhang on 8/30/17.
-//
+// I certify that no unauthorized assistance has been received or
+//given in the completion of this work
 //
 
 #include <stdio.h>
@@ -21,20 +22,14 @@ int main(){
         if(c=='\n'){
             //replace with a space
             c = ' ';
-        }else if(c=='*' && i>0){
-            //check if previous is also an ast, need handle if it is the first char as well
-            if(input[i-1]=='*'){
+        }else if(c=='*'){
+            //check if next input is a *, if so replace
+            char temp = getchar();
+            if(temp=='*'){
                 c = '^';
-                i--;
             }else{
-                //current character is an *, need to check if the next is an *
-                char temp = getchar();
-                if(temp=='*'){
-                    c = '^';
-                }else{
-                    //push back into the buffer
-                    ungetc(temp,stdin);
-                }
+                //push the temporary char back into the buffer, current char will stay as *
+                ungetc(temp,stdin);
             }
         }
         input[i] = c;
