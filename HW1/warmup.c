@@ -13,7 +13,7 @@
 //Need to add a check if, the last character is an *, see if the next char is an *
 
 int main(){
-    int outputLength = 4;
+    int outputLength = 80;
     char c;
     char input[outputLength];
     int i =0;
