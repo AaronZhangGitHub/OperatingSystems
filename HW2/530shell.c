@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <signal.h>
 
 int main(){
     while(1){
@@ -22,14 +24,16 @@ int main(){
                 return 0;
             }else{
                 fprintf(stderr, "\nError with taking in input\n");
-                exit(1);
             }
         }
         //Check if string input contains a newline, if not print to stderr
         if(strchr(input,'\n')==NULL){
             //No newline, meaning that the input was greater than the character limit
             fprintf(stderr, "Input greater than character limit of %i.\n",charInputLimit);
-            exit(1);
+            //Need to clear stdin
+            char c;
+            while ((c = getchar()) != '\n' && c != EOF) { }
+            continue; //do not consider this as input
         }
         //make a copy of the input string
         char * copyInput = malloc(strlen(input)+1);
@@ -48,7 +52,6 @@ int main(){
         }
         if(whitespaceSeperatorCount<2){
             fprintf(stderr, "Proper input not given\n");
-            exit(1);
         }
         //how many arguments there really are, this does not encompass the file path
         int loopCount = whitespaceSeperatorCount-1;
@@ -66,16 +69,20 @@ int main(){
         int childPID;
         childPID = fork();
         if(childPID<0){
-            fprintf(stderr, "\nError with forking child.\n");
-            exit(1);
+            fprintf(stderr, "Error with forking child.\n");
         }else if(childPID==0){
             int error = execvp(filePath,argArray);
             if(error<0){
-                fprintf(stderr, "\nError with calling exec.\n");
+                fprintf(stderr, "Error with calling exec.\n");
+                //kill child
                 exit(1);
             }
         }else{
-            wait(NULL);
+            pid_t terminated_pid;
+            do{
+                int waitStatus;
+                terminated_pid = wait(NULL);
+            }while(terminated_pid!=childPID);
         }
         free(copyInput);
     }
