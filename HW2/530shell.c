@@ -9,35 +9,24 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
+#include "header_file.h"
 
 int main(){
     while(1){
         //Print prompt % for user input
         printf("%% ");
-        //Take stdin from user, read line until a newline
         int charInputLimit = 75;
-        char input[charInputLimit+1];//Accounts for /0 with fgets
-        //Check if there is an error with returning the string paremeter
-        if(fgets(input,charInputLimit+1,stdin)==NULL){
-            if(feof(stdin)!=0){
-                //EOF is set, return
-                return 0;
-            }else{
-                fprintf(stderr, "\nError with taking in input\n");
-            }
+        char* input = getInput(charInputLimit);
+        if(input==NULL){
+            //EOF
+            return 0;
         }
         //Check if string input contains a newline, if not print to stderr
-        if(strchr(input,'\n')==NULL){
-            //No newline, meaning that the input was greater than the character limit
-            fprintf(stderr, "Input greater than character limit of %i.\n",charInputLimit);
-            //Need to clear stdin
-            char c;
-            while ((c = getchar()) != '\n' && c != EOF) { }
+        if(containsNewLine(input,charInputLimit)){
             continue; //do not consider this as input
         }
         //make a copy of the input string
-        char * copyInput = malloc(strlen(input)+1);
-        strcpy(copyInput,input);
+        char*copyInput = getCopiedString(input);
         
         //Arguments
         char *whitespaceSeperators =" \t\v\f\r\n";
@@ -84,7 +73,43 @@ int main(){
                 terminated_pid = wait(NULL);
             }while(terminated_pid!=childPID);
         }
+        //deallocate memory
+        free(input);
         free(copyInput);
     }
     return 0;
 }
+
+char * getInput(int charInputLimit){
+    //Take stdin from user, read line until a newline
+    char *input = malloc(charInputLimit+1);//Accounts for /0 with fgets
+    //Check if there is an error with returning the string paremeter
+    if(fgets(input,charInputLimit+1,stdin)==NULL){
+        if(feof(stdin)!=0){
+            //EOF is set, return
+            return NULL;
+        }else{
+            fprintf(stderr, "\nError with taking in input\n");
+        }
+    }
+    return input;
+}
+char * getCopiedString(char* input){
+    char * copyInput = malloc(strlen(input)+1);
+    strcpy(copyInput,input);
+    return copyInput;
+}
+int containsNewLine(char* input,int charInputLimit){
+    if(strchr(input,'\n')==NULL && feof(stdin)==0){
+        //No newline, meaning that the input was greater than the character limit
+        fprintf(stderr, "Input greater than character limit of %i.\n",charInputLimit);
+        //Need to clear stdin
+        char c;
+        while ((c = getchar()) != '\n' && c != EOF) { }
+        return 1;
+    }
+    return 0;
+}
+
+
+
