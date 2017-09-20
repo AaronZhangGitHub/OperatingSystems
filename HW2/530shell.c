@@ -42,7 +42,7 @@ int main(){
             whitespaceSeperatorCount++;
         }
         if(whitespaceSeperatorCount<2){
-            fprintf(stderr, "Proper input not given, %s.\n",strerror(errno));
+            fprintf(stderr, "Proper input not given.\n");
         }
         //how many arguments there really are, this does not encompass the file path
         int loopCount = whitespaceSeperatorCount-1;
@@ -71,7 +71,6 @@ int main(){
         }else{
             pid_t terminated_pid;
             do{
-                int waitStatus;
                 terminated_pid = wait(NULL);
             }while(terminated_pid!=childPID);
         }
