@@ -10,7 +10,8 @@
 #include <sys/types.h>
 #include <signal.h>
 #include "header_file.h"
-
+#include <sys/types.h>
+#include <sys/wait.h>
 int main(){
     while(1){
         //Print prompt % for user input
