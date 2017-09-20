@@ -12,6 +12,7 @@
 #include "header_file.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
 int main(){
     while(1){
         //Print prompt % for user input
@@ -41,7 +42,7 @@ int main(){
             whitespaceSeperatorCount++;
         }
         if(whitespaceSeperatorCount<2){
-            fprintf(stderr, "Proper input not given\n");
+            fprintf(stderr, "Proper input not given, %s.\n",strerror(errno));
         }
         //how many arguments there really are, this does not encompass the file path
         int loopCount = whitespaceSeperatorCount-1;
@@ -59,11 +60,11 @@ int main(){
         int childPID;
         childPID = fork();
         if(childPID<0){
-            fprintf(stderr, "Error with forking child.\n");
+            fprintf(stderr, "Error with forking child, %s.\n",strerror(errno));
         }else if(childPID==0){
             int error = execvp(filePath,argArray);
             if(error<0){
-                fprintf(stderr, "Error with calling exec.\n");
+                fprintf(stderr, "Error with calling exec, %s.\n",strerror(errno));
                 //kill child
                 exit(1);
             }
@@ -90,7 +91,7 @@ char * getInput(int charInputLimit){
             //EOF is set, return
             return NULL;
         }else{
-            fprintf(stderr, "\nError with taking in input\n");
+            fprintf(stderr, "\nError with taking in input, %s.\n",strerror(errno));
         }
     }
     return input;
