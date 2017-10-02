@@ -1,0 +1,14 @@
+{
+  "char5":{
+    "cases":[
+      {
+        "input":"abcdefghi\n",
+        "expected_output":"abcde\nfghi \n"
+      }
+    ]
+  },
+  "char80":{
+    "cases":[
+    ]
+  }
+}
