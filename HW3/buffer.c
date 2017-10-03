@@ -11,8 +11,6 @@
 #include <stdio.h>
 
 #include "buffer.h"
-#include "semaphore.h"
-#include "st.h"
 
 //Takes in a pointer to a buffer and the size of the buffer, creates the buffer
 int createBuffer(buffer *thisBuffer, int sizeOfBuffer){
@@ -34,23 +32,34 @@ int createBuffer(buffer *thisBuffer, int sizeOfBuffer){
     return 0;
 }
 bool isEmpty(buffer *thisBuffer){
+    //function that returns whether the buffer is empty or not
     if(thisBuffer->isEmpty==1){
         return true;
     }
     return false;
 }
 bool isFull(buffer *thisBuffer){
+    //Check to see if the current size of the buffer is equal to the max size
     if(thisBuffer->currentSize==thisBuffer->maxSize){
         return true;
     }
     return false;
 }
-char peek(buffer *thisBuffer){
+char peekHead(buffer *thisBuffer){
+    //returns head of the buffer
     if(isEmpty(thisBuffer)){
         //null val
         return 0;
     }
     return thisBuffer->charValues[thisBuffer->headPointer];
+}
+char peekTail(buffer *thisBuffer){
+    //returns tail of the buffer
+    if(isEmpty(thisBuffer)){
+        //null val
+        return 0;
+    }
+    return thisBuffer->charValues[thisBuffer->tailPointer];
 }
 //buffer is essentially a queue
 int deposit(buffer *thisBuffer, char charToAdd){
@@ -58,9 +67,9 @@ int deposit(buffer *thisBuffer, char charToAdd){
     down(&(thisBuffer->emptyBuffers));
     if(!isFull(thisBuffer)){
         //add character
-        thisBuffer->charValues[thisBuffer->head]=charToAdd;
+        thisBuffer->charValues[thisBuffer->headPointer]=charToAdd;
         //increment tail, account for overlap
-        thisBuffer->tailPointer= ((thisBuffer->tailPointer+1)%thisBuffer->(maxSize));
+        thisBuffer->tailPointer= ((thisBuffer->tailPointer+1)%(thisBuffer->maxSize));
         //Set buffer as not empty
         thisBuffer->isEmpty = 0;
         //increment size
@@ -79,8 +88,9 @@ char remoove(buffer *thisBuffer){
         returnChar = thisBuffer->charValues[thisBuffer->headPointer];
         thisBuffer->isEmpty=1;
     }else{
+        //Removes from the head of the buffer, increments head pointer
         returnChar = thisBuffer->charValues[thisBuffer->headPointer];
-        thisBuffer->headPointer = (thisBuffer->headPointer+1)%thisBuffer->maxSize;
+        thisBuffer->headPointer = (thisBuffer->headPointer+1)%(thisBuffer->maxSize);
     }
     //decrement size
     thisBuffer->currentSize--;

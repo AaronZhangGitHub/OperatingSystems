@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include "buffer.h"
-#include "semaphore.h"
 #include "st.h"
 
+int main (int argc, const char * argv[]) {
+}
