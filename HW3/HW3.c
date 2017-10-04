@@ -61,7 +61,6 @@ int main (int argc, const char * argv[]) {
         perror("st_thread_create \n");
         exit(1);
     }
-    
     if(st_thread_create(newLineToSpace,newLineToSpaceStruct,0,0)==NULL){
         perror("st_thread_create \n");
         exit(1);
@@ -75,11 +74,11 @@ int main (int argc, const char * argv[]) {
         exit(1);
     }
     
-    fflush(stdout);
     st_thread_exit(NULL);
     return 0;
 }
 void *characterInput(void *state){
+    //handles character input, breaks on EOF
     producerConsumerPair *producer = state;
     char c;
     
@@ -94,13 +93,17 @@ void *characterInput(void *state){
     st_thread_exit(NULL);
 }
 void *newLineToSpace(void *state){
+    //converts newlines '\n' to spaces ' '
     producerConsumerPair *pcPair = state;
     char processingChar;
     while(1){
+        //remove a character from consumer buffer
         processingChar = remoove(pcPair->consumerBuffer);
         if(processingChar=='\n'){
+            //check if the character is a newline, if so replace
             processingChar = ' ';
         }
+        //put character in the producer buffer
         deposit(pcPair->producerBuffer,processingChar);
         if(processingChar==EOF){
             break;
@@ -109,21 +112,26 @@ void *newLineToSpace(void *state){
     st_thread_exit(NULL);
 }
 void *doubleAsteriskToCarrot(void *state){
+    //converts a double asterisk to a carrot
     producerConsumerPair *pcPair = state;
     bool lastCharWasAsterisk = false;
     char processingChar;
     while(1){
+        //remove a char fromt he consumer buffer
         processingChar = remoove(pcPair->consumerBuffer);
         if(lastCharWasAsterisk){
+            //uses current char and last char asterisk flag to determine output to producer buffer
             if(processingChar=='*'){
                 deposit(pcPair->producerBuffer,'^');
             }else{
                 deposit(pcPair->producerBuffer,'*');
             }
+            //last asterisk will always be false, forward looking
             lastCharWasAsterisk=false;
         }else if(processingChar=='*'){
             lastCharWasAsterisk=true;
         }else{
+            //If the last char was not an aterisk and the current char is not an asterisk, deposit char
             deposit(pcPair->producerBuffer,processingChar);
         }
         if(processingChar==EOF){
@@ -136,6 +144,7 @@ void *doubleAsteriskToCarrot(void *state){
 void *characterOutput(void *state){
     producerConsumerPair *consumer = state;
     char returnedChar;
+    //create an array to record output and a counter
     int counter = 0;
     int output[80];
     while(1){
@@ -143,10 +152,11 @@ void *characterOutput(void *state){
         if(returnedChar==EOF){
             break;
         }
+        //Add the current character into the output array of characters
         output[counter]=returnedChar;
         counter++;
         if(counter==80){
-            //print out all the characters
+            //print out all the characters if the output array of characters is full
             for (int i =0; i<80;i++){
                 printf("%c",output[i]);
             }
