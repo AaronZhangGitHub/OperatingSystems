@@ -110,6 +110,7 @@ void *newLineToSpace(void *state){
             break;
         }
     }
+    free(pcPair->consumerBuffer);
     free(state);
     st_thread_exit(NULL);
 }
@@ -140,6 +141,7 @@ void *doubleAsteriskToCarrot(void *state){
             break;
         }
     }
+    free(pcPair->consumerBuffer);
     free(state);
     st_thread_exit(NULL);
 }
@@ -166,6 +168,7 @@ void *characterOutput(void *state){
             counter = 0;
         }
     }
+    free(consumer->consumerBuffer);
     free(state);
     st_thread_exit(NULL);
 }
