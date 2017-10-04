@@ -65,33 +65,23 @@ char peekTail(buffer *thisBuffer){
 int deposit(buffer *thisBuffer, char charToAdd){
     //call down on emptyBuffers
     down(&(thisBuffer->emptyBuffers));
-    if(!isFull(thisBuffer)){
-        //add character
-        thisBuffer->charValues[thisBuffer->headPointer]=charToAdd;
-        //increment tail, account for overlap
-        thisBuffer->tailPointer= ((thisBuffer->tailPointer+1)%(thisBuffer->maxSize));
-        //Set buffer as not empty
-        thisBuffer->isEmpty = 0;
-        //increment size
-        thisBuffer->currentSize+=1;
-    }
+    
+    thisBuffer->charValues[thisBuffer->tailPointer]=charToAdd;
+    //increment tail, account for overlap
+    thisBuffer->tailPointer= ((thisBuffer->tailPointer+1)%(thisBuffer->maxSize));
+    //Set buffer as not empty
+    thisBuffer->isEmpty = 0;
+    //increment size
+    thisBuffer->currentSize+=1;
+    //Call up on fullBuffers
     up(&(thisBuffer->fullBuffers));
     return 1;
 }
 char remoove(buffer *thisBuffer){
     down(&(thisBuffer->fullBuffers));
-    char returnChar;
-    if(isEmpty(thisBuffer)){
-        //do nothing
-    }else if(thisBuffer->headPointer==thisBuffer->tailPointer){
-        //head and tail are equal last value in array
-        returnChar = thisBuffer->charValues[thisBuffer->headPointer];
-        thisBuffer->isEmpty=1;
-    }else{
-        //Removes from the head of the buffer, increments head pointer
-        returnChar = thisBuffer->charValues[thisBuffer->headPointer];
-        thisBuffer->headPointer = (thisBuffer->headPointer+1)%(thisBuffer->maxSize);
-    }
+    char returnChar = thisBuffer->charValues[thisBuffer->headPointer];
+    //increment the head
+    thisBuffer->headPointer = (thisBuffer->headPointer+1)%(thisBuffer->maxSize);
     //decrement size
     thisBuffer->currentSize--;
     up(&(thisBuffer->emptyBuffers));
