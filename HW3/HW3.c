@@ -90,6 +90,7 @@ void *characterInput(void *state){
             break;
         }
     }
+    free(state);
     st_thread_exit(NULL);
 }
 void *newLineToSpace(void *state){
@@ -109,6 +110,7 @@ void *newLineToSpace(void *state){
             break;
         }
     }
+    free(state);
     st_thread_exit(NULL);
 }
 void *doubleAsteriskToCarrot(void *state){
@@ -138,7 +140,7 @@ void *doubleAsteriskToCarrot(void *state){
             break;
         }
     }
-    
+    free(state);
     st_thread_exit(NULL);
 }
 void *characterOutput(void *state){
@@ -164,5 +166,6 @@ void *characterOutput(void *state){
             counter = 0;
         }
     }
+    free(state);
     st_thread_exit(NULL);
 }
