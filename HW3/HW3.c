@@ -138,6 +138,7 @@ void *characterOutput(void *state){
     producerConsumerPair *consumer = state;
     char returnedChar;
     int counter = 0;
+    int output[80];
     while(1){
         returnedChar = remoove(consumer->consumerBuffer);
         if(returnedChar==EOF){
@@ -147,9 +148,13 @@ void *characterOutput(void *state){
         if(returnedChar==EOF){
             break;
         }
-        printf("%c",returnedChar);
+        output[counter]=returnedChar;
         counter++;
         if(counter==80){
+            //print out all the characters
+            for (int i =0; i<sizeof(output)/sizeof(char);i++){
+                printf("%c",output[i]);
+            }
             printf('\n');
             counter = 0;
         }
