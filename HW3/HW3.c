@@ -80,7 +80,6 @@ int main (int argc, const char * argv[]) {
     return 0;
 }
 void *characterInput(void *state){
-    printf("character input\n");
     producerConsumerPair *producer = state;
     char c;
     
@@ -142,20 +141,16 @@ void *characterOutput(void *state){
     while(1){
         returnedChar = remoove(consumer->consumerBuffer);
         if(returnedChar==EOF){
-            printf("\n");
-            break;
-        }
-        if(returnedChar==EOF){
             break;
         }
         output[counter]=returnedChar;
         counter++;
         if(counter==80){
             //print out all the characters
-            for (int i =0; i<sizeof(output)/sizeof(char);i++){
+            for (int i =0; i<80;i++){
                 printf("%c",output[i]);
             }
-            printf('\n');
+            printf("\n");
             counter = 0;
         }
     }
