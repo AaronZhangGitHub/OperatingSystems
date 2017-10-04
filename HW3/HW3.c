@@ -117,13 +117,18 @@ void *doubleAsteriskToCarrot(void *state){
         processingChar = remoove(pcPair->consumerBuffer);
         if(lastCharWasAsterisk){
             if(processingChar=='*'){
-                processingChar = '^';
+                deposit(pcPair->producerBuffer,'^');
             }else{
                 deposit(pcPair->producerBuffer,'*');
             }
             lastCharWasAsterisk=false;
         }else if(processingChar=='*'){
             lastCharWasAsterisk=true;
+        }else{
+            deposit(pcPair->producerBuffer,processingChar);
+        }
+        if(processingChar==EOF){
+            break;
         }
     }
     
@@ -132,6 +137,7 @@ void *doubleAsteriskToCarrot(void *state){
 void *characterOutput(void *state){
     producerConsumerPair *consumer = state;
     char returnedChar;
+    int counter = 0;
     while(1){
         returnedChar = remoove(consumer->consumerBuffer);
         if(returnedChar==EOF){
@@ -142,6 +148,11 @@ void *characterOutput(void *state){
             break;
         }
         printf("%c",returnedChar);
+        counter++;
+        if(counter==80){
+            printf('\n');
+            counter = 0;
+        }
     }
     st_thread_exit(NULL);
 }
