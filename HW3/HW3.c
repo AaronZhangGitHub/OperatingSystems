@@ -74,6 +74,7 @@ int main (int argc, const char * argv[]) {
         exit(1);
     }
     
+    fflush(stdout);
     st_thread_exit(NULL);
     return 0;
 }
