@@ -111,6 +111,10 @@ int processNewlineToSpace(pid_t childPID){
     char processingChar=0;
     while(1){
         read(inputPipe[READ_INDEX],&processingChar,1);
+        if(processingChar=='\n'){
+            //check if the character is a newline, if so replace
+            processingChar = ' ';
+        }
         write(transferPipe[WRITE_INDEX],&processingChar,1);
         if(processingChar==EOF){
             break;
