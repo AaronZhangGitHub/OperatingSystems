@@ -124,7 +124,7 @@ int processNewlineToSpace(pid_t childPID){
     close(transferPipe[WRITE_INDEX]);
     return 0;
 }
-int processDoubleAsterixToCaret(){
+int processDoubleAsterixToCaret(pid_t childPID){
     //close everything but transferpipe read and outputpipe write
     close(inputPipe[READ_INDEX]);
     close(inputPipe[WRITE_INDEX]);

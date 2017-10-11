@@ -1,5 +1,5 @@
 //
-//  Created by Aaron Zhang on 10/02/17.
+//  Created by Aaron Zhang on 10/10/17.
 // I certify that no unauthorized assistance has been received or
 //given in the completion of this work
 //
@@ -82,7 +82,6 @@ int main (int argc, const char * argv[]) {
 int processInput(pid_t childPID){
     //close everything but the inputpipe write
     close(inputPipe[READ_INDEX]);
-    //close(inputPipe[WRITE_INDEX]);
     close(transferPipe[READ_INDEX]);
     close(transferPipe[WRITE_INDEX]);
     close(outputPipe[READ_INDEX]);
@@ -104,16 +103,18 @@ int processInput(pid_t childPID){
 }
 int processNewlineToSpace(pid_t childPID){
     //close everything but inputpipe read and transfer pipewrite
-    //close(inputPipe[READ_INDEX]);
     close(inputPipe[WRITE_INDEX]);
     close(transferPipe[READ_INDEX]);
-    //close(transferPipe[WRITE_INDEX]);
     close(outputPipe[READ_INDEX]);
     close(outputPipe[WRITE_INDEX]);
     
     char processingChar=0;
     while(1){
         read(inputPipe[READ_INDEX],&processingChar,1);
+        if(processingChar=='\n'){
+            //check if the character is a newline, if so replace
+            processingChar = ' ';
+        }
         write(transferPipe[WRITE_INDEX],&processingChar,1);
         if(processingChar==EOF){
             break;
@@ -123,39 +124,37 @@ int processNewlineToSpace(pid_t childPID){
     close(transferPipe[WRITE_INDEX]);
     return 0;
 }
-int processDoubleAsterixToCaret(){
+int processDoubleAsterixToCaret(pid_t childPID){
     //close everything but transferpipe read and outputpipe write
     close(inputPipe[READ_INDEX]);
     close(inputPipe[WRITE_INDEX]);
-    //close(transferPipe[READ_INDEX]);
     close(transferPipe[WRITE_INDEX]);
     close(outputPipe[READ_INDEX]);
-    //close(outputPipe[WRITE_INDEX]);
     bool lastCharWasAsterisk = false;
     char processingChar = 0;
     char pointerToStar = '*';
-        while(1){
-            read(transferPipe[READ_INDEX],&processingChar,1);
+    while(1){
+        read(transferPipe[READ_INDEX],&processingChar,1);
+        if(lastCharWasAsterisk){
             if(lastCharWasAsterisk){
-                if(lastCharWasAsterisk){
-                    if(processingChar=='*'){
-                        processingChar = '^';
-                    }else{
-                        //write *
-                        write(outputPipe[WRITE_INDEX],&pointerToStar,1);
-                    }
-                    lastCharWasAsterisk = false;
+                if(processingChar=='*'){
+                    processingChar = '^';
+                }else{
+                    //write *
+                    write(outputPipe[WRITE_INDEX],&pointerToStar,1);
                 }
-            }else if(processingChar=='*'){
-                lastCharWasAsterisk = true;
-                //next loop
-                continue;
+                lastCharWasAsterisk = false;
             }
-            write(outputPipe[WRITE_INDEX],&processingChar,1);
-            if(processingChar==EOF){
-                break;
-            }
+        }else if(processingChar=='*'){
+            lastCharWasAsterisk = true;
+            //next loop
+            continue;
         }
+        write(outputPipe[WRITE_INDEX],&processingChar,1);
+        if(processingChar==EOF){
+            break;
+        }
+    }
     close(transferPipe[READ_INDEX]);
     close(outputPipe[WRITE_INDEX]);
     return 0;
@@ -167,7 +166,6 @@ int processOutput(void){
     close(inputPipe[WRITE_INDEX]);
     close(transferPipe[READ_INDEX]);
     close(transferPipe[WRITE_INDEX]);
-    //close(outputPipe[READ_INDEX]);
     close(outputPipe[WRITE_INDEX]);
     
     char returnedChar = 0;
@@ -194,4 +192,5 @@ int processOutput(void){
     close(outputPipe[READ_INDEX]);
     return 0;
 }
+
 
