@@ -1,5 +1,5 @@
 //
-//  Created by Aaron Zhang on 10/10/17.
+//  Created by Aaron Zhang on 10/02/17.
 // I certify that no unauthorized assistance has been received or
 //given in the completion of this work
 //
@@ -54,12 +54,22 @@ int main (int argc, const char * argv[]) {
     //get process id of the current process
     processInputPID = getpid();
     processNewlineToSpacePID = fork();
+    //check if there is an error with forking
+    if(processNewlineToSpacePID<0){
+        fprintf(stderr, "Issue with forking newline to space process...exiting\n");
+        exit(EXIT_FAILURE);
+    }
     if(processNewlineToSpacePID !=0){
         //This is a parent
         processInput(processNewlineToSpacePID);
     }else{
         //this is a child
         processDoubleAsterixToCaretPID = fork();
+        //check if there is an error with forking
+        if(processDoubleAsterixToCaretPID<0){
+            fprintf(stderr, "Issue with forking double asterix to caret process...exiting\n");
+            exit(EXIT_FAILURE);
+        }
         if(processDoubleAsterixToCaretPID!=0){
             //This is a parent
             processNewlineToSpace(processDoubleAsterixToCaretPID);
@@ -67,6 +77,11 @@ int main (int argc, const char * argv[]) {
         else{
             //this is a child
             processOutputPID = fork();
+            //check if there is an error with forking
+            if(processOutputPID<0){
+                fprintf(stderr, "Issue with forking output process...exiting\n");
+                exit(EXIT_FAILURE);
+            }
             if(processOutputPID!=0){
                 //this is a parent
                 processDoubleAsterixToCaret(processOutputPID);
@@ -110,12 +125,18 @@ int processNewlineToSpace(pid_t childPID){
     
     char processingChar=0;
     while(1){
-        read(inputPipe[READ_INDEX],&processingChar,1);
+        if(read(inputPipe[READ_INDEX],&processingChar,1)<0){
+            fprintf(stderr, "Error with reading from input pipe");
+            exit(EXIT_FAILURE);
+        }
         if(processingChar=='\n'){
             //check if the character is a newline, if so replace
             processingChar = ' ';
         }
-        write(transferPipe[WRITE_INDEX],&processingChar,1);
+        if(write(transferPipe[WRITE_INDEX],&processingChar,1)<0){
+            fprintf(stderr, "Error with writing to transfer pipe");
+            exit(EXIT_FAILURE);
+        }
         if(processingChar==EOF){
             break;
         }
@@ -134,14 +155,20 @@ int processDoubleAsterixToCaret(pid_t childPID){
     char processingChar = 0;
     char pointerToStar = '*';
     while(1){
-        read(transferPipe[READ_INDEX],&processingChar,1);
+        if(read(transferPipe[READ_INDEX],&processingChar,1)<0){
+            fprintf(stderr, "Error with reading from processing pipe");
+            exit(EXIT_FAILURE);
+        }
         if(lastCharWasAsterisk){
             if(lastCharWasAsterisk){
                 if(processingChar=='*'){
                     processingChar = '^';
                 }else{
                     //write *
-                    write(outputPipe[WRITE_INDEX],&pointerToStar,1);
+                    if(write(outputPipe[WRITE_INDEX],&pointerToStar,1)<0){
+                        fprintf(stderr, "Error with writing * to output pipe");
+                        exit(EXIT_FAILURE);
+                    }
                 }
                 lastCharWasAsterisk = false;
             }
@@ -150,7 +177,10 @@ int processDoubleAsterixToCaret(pid_t childPID){
             //next loop
             continue;
         }
-        write(outputPipe[WRITE_INDEX],&processingChar,1);
+        if(write(outputPipe[WRITE_INDEX],&processingChar,1)<0){
+            fprintf(stderr, "Error with writing to output pipe");
+            exit(EXIT_FAILURE);
+        }
         if(processingChar==EOF){
             break;
         }
@@ -173,7 +203,10 @@ int processOutput(void){
     int counter = 0;
     int output[80];
     while(1){
-        read(outputPipe[READ_INDEX],&returnedChar,1);
+        if(read(outputPipe[READ_INDEX],&returnedChar,1)<0){
+            fprintf(stderr, "Error with reading from output pipe");
+            exit(EXIT_FAILURE);
+        }
         if(returnedChar==EOF){
             break;
         }
@@ -192,5 +225,4 @@ int processOutput(void){
     close(outputPipe[READ_INDEX]);
     return 0;
 }
-
 
