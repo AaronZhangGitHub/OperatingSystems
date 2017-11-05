@@ -38,11 +38,8 @@ int main (int argc, const char * argv[]) {
 
 void receiveInput(Socket connect_socket){
     char c;
-    while(1){
+    while(c!=EOF && c!='\n'){
         c = Socket_getc(connect_socket);
-        if(c==EOF){
-            break;
-        }
         printf("%c",c);
     }
 }
