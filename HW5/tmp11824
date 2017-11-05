@@ -1,0 +1,9 @@
+total 104
+-rw-r--r--@  1 aaronzhang  staff   1392 Nov  4 20:32 HW5client.c
+-rw-r--r--@  1 aaronzhang  staff   4929 Nov  4 20:31 HW5server.c
+-rw-r--r--   1 aaronzhang  staff   2103 Oct 31 01:54 Socket.h
+-rwxr-xr-x   1 aaronzhang  staff  10028 Nov  4 20:32 client
+drwxr-xr-x  10 aaronzhang  staff    340 Oct 31 11:57 demo
+-rw-r--r--   1 aaronzhang  staff   4808 Oct 31 01:56 libsocket.c
+-rwxr-xr-x   1 aaronzhang  staff  15104 Nov  4 20:15 server
+-rw-r--r--   1 aaronzhang  staff      0 Nov  4 20:33 tmp11824
