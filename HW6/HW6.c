@@ -1,9 +1,20 @@
 //
-//  Created by Aaron Zhang on 10/02/17.
+//  Created by Aaron Zhang on 10/20/17.
 // I certify that no unauthorized assistance has been received or
 //given in the completion of this work
 //
 
+/*
+ * Problem: Producer consumer interaction with a bounded buffer as shared memory
+ * Solution: memory mapped file wraps buffer ADT, Producer and consumer given r/w permissions on this shared memory... Posix
+ * semaphores used to synchronize access to buffer.
+ *
+ * producer funciton reads from stdin and then replaces (if neccesary) the character as appropriate \n->' ' **->^, deposits in buffer
+ * consumer function consumes a character from the buffer and writes to stdout. This is done with an auxillary array to process the 80 character writes
+ * createMMAP creates the mmap
+ * forkChild, forks each child (this case producer consumer)
+ * waitForChildren waits for one child to exit, then kills them both
+ */
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -19,16 +30,13 @@
 #define FULL_SEM "/fullSEM"
 #define EMPTY_SEM "/emptySEM"
 #define ERROR -1
-//Need to get functional with i/o
-void *characterInput(void *state);
-void *newLineToSpace(void *state);
-void *doubleAsteriskToCarrot(void *state);
-void *characterOutput(void *state);
+
 void producer(buffer*mappedFile);
 void consumer(buffer*mappedFile);
 void waitForChildren(pid_t*childpids);
 buffer* createMMAP(size_t size);
 pid_t forkChild(void (*function)(buffer *), buffer* state);
+
 int main (int argc, const char * argv[]) {
     buffer *buf = createMMAP(sizeof(buffer));
     createBuffer(buf);

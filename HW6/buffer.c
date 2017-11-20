@@ -1,8 +1,15 @@
 //
-//  Created by Aaron Zhang on 10/02/17.
+//  Created by Aaron Zhang on 10/20/17.
 // I certify that no unauthorized assistance has been received or
 //given in the completion of this work
 //
+
+/*
+ * 
+ * This is my buffer.c program. This is to be used as a shared memory map.
+ * deposit is essentially an enque, remoove is a dequeue
+ *sem wait & post are used to ensure that execution is as expected
+ */
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -16,9 +23,6 @@
 
 //Takes in a pointer to a buffer and the size of the buffer, creates the buffer
 int createBuffer(buffer *thisBuffer){
-    //allocate space for ever character, size of char should be 2
-    //thisBuffer->charValues = (char*) malloc((sizeOfBuffer+1) * sizeof(char));
-    
     //Set head and tail pointer to 0
     thisBuffer->headPointer = 0;
     thisBuffer->tailPointer = 0;
@@ -28,9 +32,6 @@ int createBuffer(buffer *thisBuffer){
     thisBuffer->isEmpty = 1;
     //Set max size
     thisBuffer->maxSize = 80;
-    //semaphore implementation, empty number of buffers begin at the size of the buffer
-    //thisBuffer->emptyBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,80);
-    //thisBuffer->fullBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,0);
     return 0;
 }
 

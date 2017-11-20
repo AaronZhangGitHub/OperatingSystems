@@ -1,8 +1,13 @@
 //
-//  Created by Aaron Zhang on 10/02/17.
+//  Created by Aaron Zhang on 10/20/17.
 // I certify that no unauthorized assistance has been received or
 //given in the completion of this work
 //
+/*
+ * 
+ * This is my buffer.h program. This is to be used as a shared memory map.
+ * the rest is pretty self explanatory
+ */
 #include "semaphore.h"
 
 typedef struct{
