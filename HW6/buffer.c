@@ -9,13 +9,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <fcntl.h>
 #include "buffer.h"
 
+#define SEMAPHORE_NAME "/charSEM"
+
 //Takes in a pointer to a buffer and the size of the buffer, creates the buffer
-int createBuffer(buffer *thisBuffer, int sizeOfBuffer){
+int createBuffer(buffer *thisBuffer){
     //allocate space for ever character, size of char should be 2
-    thisBuffer->charValues = (char*) malloc((sizeOfBuffer+1) * sizeof(char));
+    //thisBuffer->charValues = (char*) malloc((sizeOfBuffer+1) * sizeof(char));
     
     //Set head and tail pointer to 0
     thisBuffer->headPointer = 0;
@@ -25,47 +27,18 @@ int createBuffer(buffer *thisBuffer, int sizeOfBuffer){
     //Set is empty flag to be 1
     thisBuffer->isEmpty = 1;
     //Set max size
-    thisBuffer->maxSize = sizeOfBuffer;
+    thisBuffer->maxSize = 80;
     //semaphore implementation, empty number of buffers begin at the size of the buffer
-    createSem(&(thisBuffer->fullBuffers),0);
-    createSem(&(thisBuffer->emptyBuffers),sizeOfBuffer);
+    //thisBuffer->emptyBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,80);
+    //thisBuffer->fullBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,0);
     return 0;
 }
-bool isEmpty(buffer *thisBuffer){
-    //function that returns whether the buffer is empty or not
-    if(thisBuffer->isEmpty==1){
-        return true;
-    }
-    return false;
-}
-bool isFull(buffer *thisBuffer){
-    //Check to see if the current size of the buffer is equal to the max size
-    if(thisBuffer->currentSize==thisBuffer->maxSize){
-        return true;
-    }
-    return false;
-}
-char peekHead(buffer *thisBuffer){
-    //returns head of the buffer
-    if(isEmpty(thisBuffer)){
-        //null val
-        return 0;
-    }
-    return thisBuffer->charValues[thisBuffer->headPointer];
-}
-char peekTail(buffer *thisBuffer){
-    //returns tail of the buffer
-    if(isEmpty(thisBuffer)){
-        //null val
-        return 0;
-    }
-    return thisBuffer->charValues[thisBuffer->tailPointer];
-}
+
+
 //buffer is essentially a queue
 int deposit(buffer *thisBuffer, char charToAdd){
     //call down on emptyBuffers
-    down(&(thisBuffer->emptyBuffers));
-    
+    sem_wait(thisBuffer->emptyBuffers);
     thisBuffer->charValues[thisBuffer->tailPointer]=charToAdd;
     //increment tail, account for overlap
     thisBuffer->tailPointer= ((thisBuffer->tailPointer+1)%(thisBuffer->maxSize));
@@ -74,16 +47,16 @@ int deposit(buffer *thisBuffer, char charToAdd){
     //increment size
     thisBuffer->currentSize+=1;
     //Call up on fullBuffers
-    up(&(thisBuffer->fullBuffers));
+    sem_post(thisBuffer->fullBuffers);
     return 1;
 }
 char remoove(buffer *thisBuffer){
-    down(&(thisBuffer->fullBuffers));
+    sem_wait(thisBuffer->fullBuffers);
     char returnChar = thisBuffer->charValues[thisBuffer->headPointer];
     //increment the head
     thisBuffer->headPointer = (thisBuffer->headPointer+1)%(thisBuffer->maxSize);
     //decrement size
     thisBuffer->currentSize--;
-    up(&(thisBuffer->emptyBuffers));
+    sem_post(thisBuffer->emptyBuffers);
     return returnChar;
 }
