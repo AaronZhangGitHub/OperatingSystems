@@ -25,6 +25,8 @@
 #include "buffer.h"
 #include <sys/types.h> // kill
 #include <signal.h>    // kill
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #define BUFFER_SIZE 80
 #define FULL_SEM "/fullSEM"
