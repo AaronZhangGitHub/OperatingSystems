@@ -27,7 +27,7 @@ int createBuffer(buffer *thisBuffer){
     //Set is empty flag to be 1
     thisBuffer->isEmpty = 1;
     //Set max size
-    thisBuffer->maxSize = sizeOfBuffer;
+    thisBuffer->maxSize = 80;
     //semaphore implementation, empty number of buffers begin at the size of the buffer
     //thisBuffer->emptyBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,80);
     //thisBuffer->fullBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,0);

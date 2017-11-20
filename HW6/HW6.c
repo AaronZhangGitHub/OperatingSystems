@@ -18,7 +18,7 @@
 #define BUFFER_SIZE 80
 #define FULL_SEM "/fullSEM"
 #define EMPTY_SEM "/emptySEM"
-
+#define ERROR -1
 //Need to get functional with i/o
 void *characterInput(void *state);
 void *newLineToSpace(void *state);
@@ -58,8 +58,8 @@ void waitForChildren(pid_t* childpids){
     }
 }
 void producer(buffer*mappedFile){
-    mappedFile->emptyBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,80-mappedFile->currentSize);
-    mappedFile->fullBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,mappedFile->currentSize);
+    mappedFile->emptyBuffers = sem_open(EMPTY_SEM,O_CREAT,S_IREAD|S_IWRITE,80-mappedFile->currentSize);
+    mappedFile->fullBuffers = sem_open(FULL_SEM,O_CREAT,S_IREAD|S_IWRITE,mappedFile->currentSize);
     if(mappedFile->emptyBuffers==SEM_FAILED||mappedFile->fullBuffers==SEM_FAILED){
         exit(EXIT_FAILURE);
     }
@@ -76,8 +76,8 @@ void producer(buffer*mappedFile){
     sem_close(mappedFile->fullBuffers);
 }
 void consumer(buffer*mappedFile){
-    mappedFile->emptyBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,80-mappedFile->currentSize);
-    mappedFile->fullBuffers = sem_open(freeName,O_CREAT,S_IREAD|S_IWRITE,mappedFile->currentSize);
+    mappedFile->emptyBuffers = sem_open(EMPTY_SEM,O_CREAT,S_IREAD|S_IWRITE,80-mappedFile->currentSize);
+    mappedFile->fullBuffers = sem_open(FULL_SEM,O_CREAT,S_IREAD|S_IWRITE,mappedFile->currentSize);
     char c;
     while(1){
         c = remoove(mappedFile);
@@ -89,7 +89,7 @@ void consumer(buffer*mappedFile){
     sem_close(mappedFile->emptyBuffers);
     sem_close(mappedFile->fullBuffers);
 }
-pid_t forkChild(void (*function)(messageObject *), messageObject* state){
+pid_t forkChild(void (*function)(buffer *), buffer* state){
     //This function takes a pointer to a function as an argument
     //and the functions argument. It then returns the forked child's pid.
     
@@ -125,27 +125,12 @@ buffer* createMMAP(size_t size){
 
 void deleteMMAP(void* addr){
     //This deletes the memory map at given address. see man mmap
-    if (ERROR == munmap(addr, sizeof(messageObject))){
+    if (ERROR == munmap(addr, sizeof(buffer))){
         perror("error deleting mmap");
         exit(EXIT_FAILURE);
     }
 }
-void *characterInput(void *state){
-    //handles character input, breaks on EOF
-    producerConsumerPair *producer = state;
-    char c;
-    
-    while (1){
-        //deposit into buffer until EOF
-        c=getchar();
-        deposit(producer->producerBuffer,c);
-        if(c==EOF){
-            break;
-        }
-    }
-    free(state);
-    st_thread_exit(NULL);
-}
+/*
 void *newLineToSpace(void *state){
     //converts newlines '\n' to spaces ' '
     producerConsumerPair *pcPair = state;
@@ -225,3 +210,4 @@ void *characterOutput(void *state){
     free(state);
     st_thread_exit(NULL);
 }
+*/
