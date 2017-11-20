@@ -93,10 +93,21 @@ void producer(buffer*mappedFile){
 void consumer(buffer*mappedFile){
     mappedFile->emptyBuffers = sem_open(EMPTY_SEM,O_CREAT,S_IREAD|S_IWRITE,80-mappedFile->currentSize);
     mappedFile->fullBuffers = sem_open(FULL_SEM,O_CREAT,S_IREAD|S_IWRITE,mappedFile->currentSize);
+    int output[80];
+    int counter = 0;
     char c;
     while(1){
         c = remoove(mappedFile);
-        printf("%c",c);
+        output[counter]=c;
+        counter++;
+        if(counter==80){
+            //print out all the characters if the output array of characters is full
+            for (int i =0; i<80;i++){
+                printf("%c",output[i]);
+            }
+            printf("\n");
+            counter = 0;
+        }
         fflush(stdout);
         if(c==EOF){
             break;
