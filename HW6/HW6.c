@@ -64,9 +64,24 @@ void producer(buffer*mappedFile){
         exit(EXIT_FAILURE);
     }
     char c;
+    bool lastCharWasAsterisk = false;
     while(1){
         c=getchar();
-        deposit(mappedFile,c);
+        if(c=='\n'){
+            c = ' ';
+        }
+        if(lastCharWasAsterisk){
+            if(c =='*'){
+                deposit(mappedFile,'^');
+            }else{
+                deposit(mappedFile,'*');
+            }
+            lastCharWasAsterisk = false;
+        }else if(c=='*'){
+            lastCharWasAsterisk = true;
+        }else{
+         deposit(mappedFile,c);
+        }
         if(c==EOF){
             deposit(mappedFile,c);
             break;
@@ -78,10 +93,22 @@ void producer(buffer*mappedFile){
 void consumer(buffer*mappedFile){
     mappedFile->emptyBuffers = sem_open(EMPTY_SEM,O_CREAT,S_IREAD|S_IWRITE,80-mappedFile->currentSize);
     mappedFile->fullBuffers = sem_open(FULL_SEM,O_CREAT,S_IREAD|S_IWRITE,mappedFile->currentSize);
+    int output[80];
+    int counter = 0;
     char c;
     while(1){
         c = remoove(mappedFile);
-        printf("%c",c);
+        output[counter]=c;
+        counter++;
+        if(counter==80){
+            //print out all the characters if the output array of characters is full
+            for (int i =0; i<80;i++){
+                printf("%c",output[i]);
+            }
+            printf("\n");
+            counter = 0;
+        }
+        fflush(stdout);
         if(c==EOF){
             break;
         }
@@ -130,84 +157,3 @@ void deleteMMAP(void* addr){
         exit(EXIT_FAILURE);
     }
 }
-/*
-void *newLineToSpace(void *state){
-    //converts newlines '\n' to spaces ' '
-    producerConsumerPair *pcPair = state;
-    char processingChar;
-    while(1){
-        //remove a character from consumer buffer
-        processingChar = remoove(pcPair->consumerBuffer);
-        if(processingChar=='\n'){
-            //check if the character is a newline, if so replace
-            processingChar = ' ';
-        }
-        //put character in the producer buffer
-        deposit(pcPair->producerBuffer,processingChar);
-        if(processingChar==EOF){
-            break;
-        }
-    }
-    free(pcPair->consumerBuffer);
-    free(state);
-    st_thread_exit(NULL);
-}
-void *doubleAsteriskToCarrot(void *state){
-    //converts a double asterisk to a carrot
-    producerConsumerPair *pcPair = state;
-    bool lastCharWasAsterisk = false;
-    char processingChar;
-    while(1){
-        //remove a char fromt he consumer buffer
-        processingChar = remoove(pcPair->consumerBuffer);
-        if(lastCharWasAsterisk){
-            //uses current char and last char asterisk flag to determine output to producer buffer
-            if(processingChar=='*'){
-                deposit(pcPair->producerBuffer,'^');
-            }else{
-                deposit(pcPair->producerBuffer,'*');
-            }
-            //last asterisk will always be false, forward looking
-            lastCharWasAsterisk=false;
-        }else if(processingChar=='*'){
-            lastCharWasAsterisk=true;
-        }else{
-            //If the last char was not an aterisk and the current char is not an asterisk, deposit char
-            deposit(pcPair->producerBuffer,processingChar);
-        }
-        if(processingChar==EOF){
-            break;
-        }
-    }
-    free(pcPair->consumerBuffer);
-    free(state);
-    st_thread_exit(NULL);
-}
-void *characterOutput(void *state){
-    producerConsumerPair *consumer = state;
-    char returnedChar;
-    //create an array to record output and a counter
-    int counter = 0;
-    int output[80];
-    while(1){
-        returnedChar = remoove(consumer->consumerBuffer);
-        if(returnedChar==EOF){
-            break;
-        }
-        //Add the current character into the output array of characters
-        output[counter]=returnedChar;
-        counter++;
-        if(counter==80){
-            //print out all the characters if the output array of characters is full
-            for (int i =0; i<80;i++){
-                printf("%c",output[i]);
-            }
-            printf("\n");
-            counter = 0;
-        }
-    }
-    free(consumer->consumerBuffer);
-    free(state);
-    st_thread_exit(NULL);
-}
-*/
